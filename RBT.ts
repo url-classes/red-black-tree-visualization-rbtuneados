@@ -1,4 +1,6 @@
-class NodeRBT {
+
+
+export class NodeRBT {
     private data: number;
     private father!: NodeRBT; 
     private leftChild!: NodeRBT; 
@@ -53,7 +55,7 @@ class NodeRBT {
     }
 }
 
-class RBTree {
+export class RBTree {
     private root: NodeRBT;
     private leaf: NodeRBT;
     private traversalResult: HTMLElement;
@@ -180,6 +182,8 @@ class RBTree {
 
     public preorder(): void {
         console.log("Preorden recorrido");
+        console.log('root');
+        console.log(this.root);
         const result: number[] = [];
         this.preorderTraversal(this.root, result);
         this.updateTraversalResult(result);
@@ -283,15 +287,82 @@ class RBTree {
             searchResult.innerText = 'Valor no encontrado';
         }
     }
+
+    public toD3Format(node: NodeRBT): any {
+        if (node === this.leaf) {
+            return null;
+        }
+
+        return {
+            name: node.getData(),
+            children: [
+                this.toD3Format(node.getLeftChild()),
+                this.toD3Format(node.getRightChild())
+            ].filter(child => child !== null)
+        };
+    }
+
+    public drawTree(ctx: CanvasRenderingContext2D, node: NodeRBT, x: number, y: number, offset: number): void {
+        if (node === this.root) return; // O cualquier condición que necesites para detener la recursión
+    
+        console.log(`Dibujando nodo: ${node.getData()} en (${x}, ${y})`); // Mensaje de depuración
+    
+        ctx.fillStyle = node.getColor() === "RED" ? "red" : "black";
+        ctx.beginPath();
+        ctx.arc(x, y, 20, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = "white";
+        ctx.fillText(node.getData().toString(), x - 10, y + 5);
+    
+        if (node.getLeftChild() !== this.leaf) {
+            ctx.beginPath();
+            ctx.moveTo(x, y);
+            ctx.lineTo(x - offset, y + 60);
+            ctx.stroke();
+            this.drawTree(ctx, node.getLeftChild(), x - offset, y + 60, offset / 2);
+        }
+    
+        if (node.getRightChild() !== this.leaf) {
+            ctx.beginPath();
+            ctx.moveTo(x, y);
+            ctx.lineTo(x + offset, y + 60);
+            ctx.stroke();
+            this.drawTree(ctx, node.getRightChild(), x + offset, y + 60, offset / 2);
+        }
+    }
+    
+    public isLeaf(node: NodeRBT): boolean {
+        return node === this.leaf;
+    }
+    
 }
 
 
 
+const canvas = document.getElementById('myCanvas') as HTMLCanvasElement;
+const ctx = canvas.getContext('2d');
 
-const tree = new RBTree();
-tree.bindTraversalButtons('preOrder', 'inOrder', 'postOrder');
+if (!ctx) {
+    console.error("No se pudo obtener el contexto del canvas.");
+} else {
+    // Limpia el canvas antes de dibujar
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-tree.insert(10);
-tree.insert(20);
-tree.insert(5);
+    const tree = new RBTree();
+    tree.bindTraversalButtons('preOrder', 'inOrder', 'postOrder');
 
+    tree.insert(10);
+    tree.insert(20);
+    tree.insert(5);
+
+    // Verifica que el árbol tiene nodos
+    const root = tree.getRoot(); // Asegúrate de que la raíz no es un nodo hoja
+    console.log(root); // Muestra la raíz en la consola
+
+    if (!tree.isLeaf(root)) {
+        ctx.clearRect(0, 0, canvas.width, canvas.height); // Limpia el canvas antes de dibujar
+        tree.drawTree(ctx, root, canvas.width / 2, 20, 100);
+    } else {
+        console.log("El árbol está vacío.");
+    }
+}
