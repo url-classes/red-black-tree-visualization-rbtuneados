@@ -329,3 +329,37 @@ document.addEventListener("DOMContentLoaded", function () {
     // Dibuja el árbol una vez que se haya insertado algún nodo
     rbt.drawTree(ctx, rbt.getRoot(), canvas.width / 2, 50, 100);
 });
+
+
+function clearCanvas() {
+    const canvas = document.getElementById('treeCanvas');
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+}
+
+document.getElementById('insertNode').addEventListener('click', () => {
+    const canvas = document.getElementById('treeCanvas');
+    const ctx = canvas.getContext('2d');
+    const data = parseInt(document.getElementById('nodeValue').value);
+    if (!isNaN(data)) { // Verifica si el valor ingresado es un número
+        clearCanvas();
+        rbt.insert(data);  // Inserta el nodo en el árbol
+          // Limpia el canvas antes de redibujar
+        rbt.drawTree(ctx, rbt.getRoot(), canvas.width / 2, 50, 100);  // Redibuja el árbol en el canvas
+    } else {
+        alert("Por favor, ingresa un valor numérico válido.");
+    }
+});
+
+document.getElementById('deleteNode').addEventListener('click', () => {
+    const canvas = document.getElementById('treeCanvas');
+    const ctx = canvas.getContext('2d');
+    const data = parseInt(document.getElementById('nodeValue').value);
+    if (!isNaN(data)) { // Verifica si el valor ingresado es un número
+        rbt.delete(data);  
+        clearCanvas();  // Limpia el canvas antes de redibujar
+        rbt.drawTree(ctx, rbt.getRoot(), canvas.width / 2, 50, 100);  // Redibuja el árbol en el canvas
+    } else {
+        alert("Por favor, ingresa un valor numérico válido.");
+    }
+});
