@@ -196,6 +196,8 @@ class RBTree {
         postOrderButton.addEventListener('click', () => this.postorder());
     }
 
+    
+
     insert(data) {
         if (data > 0) {
             var newNode = new NodeRBT(data);
@@ -246,23 +248,11 @@ class RBTree {
         return this.searchNode(this.root, dataToSearch);
     }
 
-    searchNode(node, dataToSearch) {
-        if (node === this.leaf || node === null) {
-            return false;
-        }
-        if (dataToSearch === node.getData()) {
-            return true;
-        } else if (dataToSearch < node.getData()) {
-            return this.searchNode(node.getLeftChild(), dataToSearch);
-        } else {
-            return this.searchNode(node.getRightChild(), dataToSearch);
-        }
-    }
 
     searchPrint(dataToSearch) {
         var searchResult = document.getElementById('searchResult');
         if (this.searchRecursive(dataToSearch)) {
-            searchResult.innerText = `Valor encontrado: ${dataToSearch}`;
+            searchResult.innerText = Valor encontrado: ${dataToSearch};
         } else {
             searchResult.innerText = 'Valor no encontrado';
         }
@@ -283,7 +273,7 @@ class RBTree {
 
     drawTree(ctx, node, x, y, offset) {
         if (node === this.leaf) return; // Detener si el nodo es una hoja
-        console.log(`Dibujando nodo: ${node.getData()} en (${x}, ${y})`); // Mensaje de depuración
+        console.log(Dibujando nodo: ${node.getData()} en (${x}, ${y})); // Mensaje de depuración
         ctx.fillStyle = node.getColor() === "RED" ? "red" : "black";
         ctx.beginPath();
         ctx.arc(x, y, 15, 0, Math.PI * 2);
@@ -307,6 +297,136 @@ class RBTree {
             this.drawTree(ctx, node.getRightChild(), x + offset, y + 50, offset / 2);
         }
     }
+
+    searchNode(node, dataToSearch) {
+        if (node === this.leaf || node === null) {
+            return null;
+        }
+        if (dataToSearch === node.getData()) {
+            return node;
+        } else if (dataToSearch < node.getData()) {
+            return this.searchNode(node.getLeftChild(), dataToSearch);
+        } else {
+            return this.searchNode(node.getRightChild(), dataToSearch);
+        }
+    }
+    
+    delete(data) {
+        const nodeToDelete = this.searchNode(this.root, data); // Ahora devolverá el nodo o null
+        if (!nodeToDelete) {
+            console.log("Valor no encontrado");
+            return;
+        }
+        this.deleteNode(nodeToDelete);    
+    }
+
+    deleteNode(node) {
+        let originalColor = node.getColor();
+        let replacementNode;
+
+        if (node.getLeftChild() === this.leaf) {
+            replacementNode = node.getRightChild();
+            this.transplant(node, node.getRightChild());
+        } else if (node.getRightChild() === this.leaf) {
+            replacementNode = node.getLeftChild();
+            this.transplant(node, node.getLeftChild());
+        } else {
+            let successor = this.minimum(node.getRightChild());
+            originalColor = successor.getColor();
+            replacementNode = successor.getRightChild();
+            if (successor.getFather() === node) {
+                replacementNode.setFather(successor);
+            } else {
+                this.transplant(successor, successor.getRightChild());
+                successor.setRightChild(node.getRightChild());
+                successor.getRightChild().setFather(successor);
+            }
+            this.transplant(node, successor);
+            successor.setLeftChild(node.getLeftChild());
+            successor.getLeftChild().setFather(successor);
+            successor.color = node.getColor();
+        }
+
+        if (originalColor === "BLACK") {
+            this.fixDelete(replacementNode);
+        }
+    }
+
+    transplant(u, v) {
+        if (u.getFather() === this.leaf) {
+            this.root = v;
+        } else if (u === u.getFather().getLeftChild()) {
+            u.getFather().setLeftChild(v);
+        } else {
+            u.getFather().setRightChild(v);
+        }
+        v.setFather(u.getFather());
+    }
+
+    fixDelete(node) {
+        while (node !== this.root && node.getColor() === "BLACK") {
+            if (node === node.getFather().getLeftChild()) {
+                let sibling = node.getFather().getRightChild();
+                if (sibling.getColor() === "RED") {
+                    sibling.setNodeAsBlack();
+                    node.getFather().setNodeAsRed();
+                    this.leftRotate(node.getFather());
+                    sibling = node.getFather().getRightChild();
+                }
+                if (sibling.getLeftChild().getColor() === "BLACK" &&
+                    sibling.getRightChild().getColor() === "BLACK") {
+                    sibling.setNodeAsRed();
+                    node = node.getFather();
+                } else {
+                    if (sibling.getRightChild().getColor() === "BLACK") {
+                        sibling.getLeftChild().setNodeAsBlack();
+                        sibling.setNodeAsRed();
+                        this.rightRotate(sibling);
+                        sibling = node.getFather().getRightChild();
+                    }
+                    sibling.setColor(node.getFather().getColor());
+                    node.getFather().setNodeAsBlack();
+                    sibling.getRightChild().setNodeAsBlack();
+                    this.leftRotate(node.getFather());
+                    node = this.root;
+                }
+            } else {
+                let sibling = node.getFather().getLeftChild();
+                if (sibling.getColor() === "RED") {
+                    sibling.setNodeAsBlack();
+                    node.getFather().setNodeAsRed();
+                    this.rightRotate(node.getFather());
+                    sibling = node.getFather().getLeftChild();
+                }
+                if (sibling.getRightChild().getColor() === "BLACK" &&
+                    sibling.getLeftChild().getColor() === "BLACK") {
+                    sibling.setNodeAsRed();
+                    node = node.getFather();
+                } else {
+                    if (sibling.getLeftChild().getColor() === "BLACK") {
+                        sibling.getRightChild().setNodeAsBlack();
+                        sibling.setNodeAsRed();
+                        this.leftRotate(sibling);
+                        sibling = node.getFather().getLeftChild();
+                    }
+                    sibling.setColor(node.getFather().getColor());
+                    node.getFather().setNodeAsBlack();
+                    sibling.getLeftChild().setNodeAsBlack();
+                    this.rightRotate(node.getFather());
+                    node = this.root;
+                }
+            }
+        }
+        node.setNodeAsBlack();
+    }
+
+    minimum(node) {
+        while (node.getLeftChild() !== this.leaf) {
+            node = node.getLeftChild();
+        }
+        return node;
+    }
+
     
 }
 
@@ -318,18 +438,19 @@ rbt.insert(7);
 rbt.insert(40);
 rbt.insert(25);
 rbt.insert(8);
-rbt.insert(9); 
-rbt.insert(); 
+//rbt.delete(5)
+
+ 
 
 document.addEventListener("DOMContentLoaded", function () {
     rbt.bindTraversalButtons('preOrder', 'inOrder', 'postOrder');
+
     const canvas = document.getElementById('treeCanvas');
     const ctx = canvas.getContext('2d');
 
     // Dibuja el árbol una vez que se haya insertado algún nodo
     rbt.drawTree(ctx, rbt.getRoot(), canvas.width / 2, 50, 100);
 });
-
 
 function clearCanvas() {
     const canvas = document.getElementById('treeCanvas');
