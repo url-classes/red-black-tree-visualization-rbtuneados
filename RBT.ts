@@ -265,7 +265,7 @@ export class RBTree {
         return this.searchNode(this.root, dataToSearch);
     }
     
-searchNode(node, dataToSearch) {
+    public searchNode(node, dataToSearch) {
         if (node === this.leaf || node === null) {
             return null;
         }
@@ -278,7 +278,7 @@ searchNode(node, dataToSearch) {
         }
     }
     
-    delete(data) {
+    public delete(data) {
         const nodeToDelete = this.searchNode(this.root, data); // Ahora devolverá el nodo o null
         if (!nodeToDelete) {
             console.log("Valor no encontrado");
@@ -287,7 +287,7 @@ searchNode(node, dataToSearch) {
         this.deleteNode(nodeToDelete);    
     }
 
-    deleteNode(node) {
+    private deleteNode(node) {
         let originalColor = node.getColor();
         let replacementNode;
 
@@ -319,7 +319,7 @@ searchNode(node, dataToSearch) {
         }
     }
 
-    transplant(u, v) {
+    public transplant(u, v) {
         if (u.getFather() === this.leaf) {
             this.root = v;
         } else if (u === u.getFather().getLeftChild()) {
@@ -330,7 +330,7 @@ searchNode(node, dataToSearch) {
         v.setFather(u.getFather());
     }
 
-    fixDelete(node) {
+    public fixDelete(node) {
         while (node !== this.root && node.getColor() === "BLACK") {
             if (node === node.getFather().getLeftChild()) {
                 let sibling = node.getFather().getRightChild();
@@ -387,12 +387,12 @@ searchNode(node, dataToSearch) {
         node.setNodeAsBlack();
     }
 
-    minimum(node) {
+    public minimum(node) {
         while (node.getLeftChild() !== this.leaf) {
             node = node.getLeftChild();
         }
-        return node;
-    }
+        return node;
+    }
 
     
     public searchPrint(dataToSearch: number): void {
