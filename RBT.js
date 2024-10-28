@@ -252,7 +252,7 @@ class RBTree {
     searchPrint(dataToSearch) {
         var searchResult = document.getElementById('searchResult');
         if (this.searchRecursive(dataToSearch)) {
-            searchResult.innerText = Valor encontrado: ${dataToSearch};
+            searchResult.innerText = `Valor encontrado: ${dataToSearch}`;
         } else {
             searchResult.innerText = 'Valor no encontrado';
         }
@@ -273,7 +273,7 @@ class RBTree {
 
     drawTree(ctx, node, x, y, offset) {
         if (node === this.leaf) return; // Detener si el nodo es una hoja
-        console.log(Dibujando nodo: ${node.getData()} en (${x}, ${y})); // Mensaje de depuración
+        console.log(`Dibujando nodo: ${node.getData()} en (${x}, ${y})`); // Mensaje de depuración
         ctx.fillStyle = node.getColor() === "RED" ? "red" : "black";
         ctx.beginPath();
         ctx.arc(x, y, 15, 0, Math.PI * 2);
