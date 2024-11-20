@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RBT Visualizer</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <h1>Visualizador de Árboles Rojo-Negro</h1>
+    </header>
+
+    <main>
+        <div class="controls">
+            <input type="number" id="nodeValue" placeholder="Valor del nodo">
+            <button id="insertNode">Insertar Nodo</button>
+            <button id="deleteNode">Eliminar Nodo</button>
+        </div>
+
+        <div class="traversals">
+            <button id="preOrder">Preorden</button>
+            <button id="inOrder">Inorden</button>
+            <button id="postOrder">Postorden</button>
+        </div>
+
+        <div id="traversalResult" class="traversal-result">
+        </div>
+
+        <div id="searchResult"></div>
+
+
+       <canvas id="treeCanvas" width="800" height="600"></canvas>
+
+        </div>
+    </main>
+
+    <footer>
+        <p>Diego Abdo</p>
+        <p>Angie Santiago</p>
+        <p>Christian Villegas</p>
+    </footer>
+
+    <script type='module' src="./RBT.js"></script>
+
+</body>
+</html>
